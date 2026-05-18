@@ -19,7 +19,7 @@ export default function DashboardPage() {
     }).catch(() => { logout(); navigate('/login') })
   }, [token, navigate, logout])
 
-  const handleLogout = () => { logout(); navigate('/login') }
+  const handleLogout = () => { logout(); navigate('/') }
 
   const cards = [
     { label: 'Clients', value: stats.clients, icon: Users, color: 'emerald' },

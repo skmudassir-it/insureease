@@ -8,7 +8,7 @@ interface AuthState {
   token: string | null
   loading: boolean
   login: (email: string, password: string) => Promise<void>
-  register: (name: string, email: string, password: string) => Promise<void>
+  register: (name: string, email: string, password: string, role?: string) => Promise<void>
   logout: () => void
   loadUser: () => void
 }
@@ -24,8 +24,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     localStorage.setItem('user', JSON.stringify(user))
     set({ user, token: access_token })
   },
-  register: async (name, email, password) => {
-    const res = await apiClient.post('/auth/register', { name, email, password })
+  register: async (name, email, password, role = 'agent') => {
+    const res = await apiClient.post('/auth/register', { name, email, password, role })
     const { user, access_token } = res.data
     localStorage.setItem('token', access_token)
     localStorage.setItem('user', JSON.stringify(user))

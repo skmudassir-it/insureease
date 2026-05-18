@@ -12,6 +12,7 @@ class RegisterRequest(BaseModel):
     name: str
     email: EmailStr
     password: str
+    role: str = "agent"  # "admin", "agent", or "client"
 
 class LoginRequest(BaseModel):
     email: EmailStr
@@ -23,6 +24,8 @@ async def health():
 
 @router.post("/register")
 async def register(req: RegisterRequest, db=Depends(get_db)):
+    if req.role not in ("admin", "agent", "client"):
+        raise HTTPException(status_code=400, detail="Invalid role. Must be admin, agent, or client")
     existing = await db.users.find_one({"email": req.email})
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -30,14 +33,14 @@ async def register(req: RegisterRequest, db=Depends(get_db)):
         "name": req.name,
         "email": req.email,
         "hashed_password": hash_password(req.password),
-        "role": "agent",
+        "role": req.role,
         "is_active": True,
         "created_at": datetime.now(timezone.utc),
         "updated_at": datetime.now(timezone.utc),
     }
     result = await db.users.insert_one(user)
     user["_id"] = str(result.inserted_id)
-    access = create_access_token(str(result.inserted_id), "agent")
+    access = create_access_token(str(result.inserted_id), req.role)
     refresh = create_refresh_token(str(result.inserted_id))
     return {"user": {"id": user["_id"], "name": user["name"], "email": user["email"], "role": user["role"]}, "access_token": access, "refresh_token": refresh}
 
