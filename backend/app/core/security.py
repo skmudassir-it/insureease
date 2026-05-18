@@ -6,7 +6,8 @@ from app.config import settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    # bcrypt has 72-byte limit
+    return pwd_context.hash(password[:72])
 
 def verify_password(plain: str, hashed: str) -> bool:
     return pwd_context.verify(plain, hashed)
