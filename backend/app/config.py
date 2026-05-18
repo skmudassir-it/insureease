@@ -32,6 +32,10 @@ class Settings(BaseSettings):
     RENEWAL_SCAN_CRON_MINUTE: int = 0
     RENEWAL_SCAN_TIMEZONE: str = "America/Chicago"
 
+    STRIPE_SECRET_KEY: str = ""
+    STRIPE_WEBHOOK_SECRET: str = ""
+    CLIENT_PORTAL_URL: str = "http://localhost:5173/portal"
+
     AI_PROVIDER: str = "none"
     AI_API_KEY: str = ""
     AI_MODEL: str = ""
