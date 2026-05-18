@@ -1,14 +1,33 @@
 import { create } from 'zustand'
 import { apiClient } from '../api/client'
-import type { User } from '../types'
+
+interface User {
+  id: string
+  name: string
+  email: string
+  role: string
+  company_id?: string
+  client_id?: string
+  is_approved?: boolean
+}
 
 interface AuthState {
   user: User | null
   token: string | null
   loading: boolean
   login: (email: string, password: string) => Promise<User>
-  register: (data: Record<string, unknown>) => Promise<void>
-  agentApply: (data: Record<string, unknown>) => Promise<void>
+  registerAdmin: (data: {
+    name: string; email: string; password: string;
+    agency_name: string; agency_type: string;
+    phone?: string; address_street?: string; address_city?: string;
+    address_state?: string; address_zip?: string;
+  }) => Promise<void>
+  registerAgent: (data: {
+    name: string; email: string; password: string;
+    phone?: string; license_number?: string;
+    license_state?: string; license_expiry?: string;
+    company_id: string;
+  }) => Promise<{ message: string; company_name: string }>
   logout: () => void
   loadUser: () => void
   getRedirectPath: () => string
@@ -28,16 +47,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     return user as User
   },
 
-  register: async (data) => {
-    const res = await apiClient.post('/auth/register', data)
+  registerAdmin: async (data) => {
+    const res = await apiClient.post('/auth/register/admin', data)
     const { user, access_token } = res.data
     localStorage.setItem('token', access_token)
     localStorage.setItem('user', JSON.stringify(user))
     set({ user, token: access_token })
   },
 
-  agentApply: async (data) => {
-    await apiClient.post('/auth/agent-apply', data)
+  registerAgent: async (data) => {
+    const res = await apiClient.post('/auth/register/agent', data)
+    return res.data
   },
 
   logout: () => {

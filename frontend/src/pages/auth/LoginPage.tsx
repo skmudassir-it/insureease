@@ -8,15 +8,16 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const login = useAuthStore((s) => s.login)
+  const getRedirectPath = useAuthStore((s) => s.getRedirectPath)
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     try {
-      await login(email, password)
+      const user = await login(email, password)
       toast.success('Welcome back!')
-      navigate('/dashboard')
+      navigate(getRedirectPath())
     } catch (err: any) {
       toast.error(err.response?.data?.detail || 'Login failed')
     } finally {

@@ -41,7 +41,7 @@ export default function RegisterPage() {
   const [selectedAgencyId, setSelectedAgencyId] = useState('')
   const [searchingAgency, setSearchingAgency] = useState(false)
 
-  const { register, agentApply } = useAuthStore()
+  const { registerAdmin, registerAgent } = useAuthStore()
   const navigate = useNavigate()
 
   const handleRoleSelect = (role: 'admin' | 'agent' | 'client') => {
@@ -57,15 +57,13 @@ export default function RegisterPage() {
     e.preventDefault()
     setLoading(true)
     try {
-      await register({
+      await registerAdmin({
         name: adminName,
         email: adminEmail,
         password: adminPassword,
-        role: 'admin',
         agency_name: agencyName,
         agency_type: agencyType,
         phone: adminPhone,
-        address: adminAddress,
       })
       toast.success('Agency account created!')
       navigate('/admin/dashboard')
@@ -99,19 +97,18 @@ export default function RegisterPage() {
     }
     setLoading(true)
     try {
-      await agentApply({
+      const result = await registerAgent({
         name: agentName,
         email: agentEmail,
         password: agentPassword,
-        role: 'agent',
         phone: agentPhone,
         license_number: licenseNumber,
         license_state: licenseState,
         license_expiry: licenseExpiry,
-        agency_id: selectedAgencyId,
+        company_id: selectedAgencyId,
       })
       toast.success('Application submitted!')
-      navigate('/waiting', { state: { agencyName: agencies.find(a => a.id === selectedAgencyId)?.name || 'the agency' } })
+      navigate('/waiting', { state: { agencyName: result.company_name || 'the agency' } })
     } catch (err: any) {
       toast.error(err.response?.data?.detail || 'Application failed')
     } finally {
