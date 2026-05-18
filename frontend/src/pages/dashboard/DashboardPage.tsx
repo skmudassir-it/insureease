@@ -10,14 +10,14 @@ interface Stats { clients: number; policies: number; tasks: number; notification
 export default function DashboardPage() {
   const { user, token, logout } = useAuthStore()
   const navigate = useNavigate()
-  const [stats, setStats] = useState<Stats>({ clients: 0, policies: 0, tasks: 0, notifications: 0 })
+  const [stats] = useState<Stats>({ clients: 0, policies: 0, tasks: 0, notifications: 0 })
 
   useEffect(() => {
     if (!token) { navigate('/login'); return }
     apiClient.get('/auth/me').then(r => {
       useAuthStore.setState({ user: r.data })
-    }).catch(() => {})
-  }, [])
+    }).catch(() => { logout(); navigate('/login') })
+  }, [token, navigate, logout])
 
   const handleLogout = () => { logout(); navigate('/login') }
 
