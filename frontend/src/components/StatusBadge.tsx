@@ -1,4 +1,4 @@
-import { cn } from '../../lib/utils'
+import { cn } from '../lib/utils'
 
 type StatusVariant = 'active' | 'inactive' | 'pending' | 'expired' | 'cancelled' | 'approved' | 'rejected' | 'in_progress' | 'completed' | 'paid' | 'overdue' | 'critical' | 'warning' | 'info'
 
